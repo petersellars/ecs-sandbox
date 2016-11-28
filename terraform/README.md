@@ -17,9 +17,10 @@ export TF_VAR_key_file=~/.ssh/devops-ecs.pem
 export TF_VAR_aws_access_key="AWS_ACCESS_KEY_ID"
 export TF_VAR_aws_secret_key="AWS_SECRET_KEY"
 ```
-3. Run the plan:
+3. Check and Run the plan:
 ```
-terraform apply
+terraform plan
+terraform apply 
 ```
 
 ### Terraform User & AWS ECS Key Pair
