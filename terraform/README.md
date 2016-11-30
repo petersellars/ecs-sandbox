@@ -19,10 +19,43 @@ export TF_VAR_key_file=~/.ssh/devops-ecs.pem
 export TF_VAR_aws_access_key="AWS_ACCESS_KEY_ID"
 export TF_VAR_aws_secret_key="AWS_SECRET_KEY"
 ```
-3. Check and Run the plan:
+3. Set the cluster variables:
+Create a cluster.tfvars file based on the `terraform.tfvars` and set your
+cluster variables. The specifications will need to be changed/added based on
+your variables. Remember to use the variables with the Terraform commands
+using the `-var-file=cluster.tfvars` format.
+
+4. Check and Run the plan:
+With the default variables in `terraform.tfvars`
 ```
 terraform plan
 terraform apply 
+```
+With cluster specific variables in `cluster.tfvars`
+```
+terraform plan -var-file=cluster.tfvars
+terraform apply -var-file=cluster.tfvars
+```
+5. Run the tests
+6. Tear down the resources
+Terraform can remove all the resources added.
+
+With the default variables
+```
+terraform destroy
+```
+With cluster specific variables
+```
+terraform destroy -var-files=cluster.tfvars
+```
+
+## Linting/Styling
+This repo uses [Rubocop](http://rubocop.readthedocs.io/en/latest/) for static
+code analysis. This will enforce guidelines outlined in the [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide).
+A configuration file [./.rubocop.yml] can be found in the root directory. To
+run rubocop you will need to execute:
+```
+bundle exec rubocop
 ```
 
 ## Testing and TDD

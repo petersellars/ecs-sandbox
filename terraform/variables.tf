@@ -11,6 +11,11 @@ variable "region" {
   default = "ap-southeast-2"
 }
 
+variable "ecs_cluster_name" {
+  description = "Name of the Amazon ECS cluster"
+  default = "default"
+}
+
 variable "key_name" {
   description = "AWS SSH Key Name"
   default = ""
