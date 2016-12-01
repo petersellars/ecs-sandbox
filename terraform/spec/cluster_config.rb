@@ -9,7 +9,7 @@ RSpec.shared_context 'cluster_config', a: :b do
   let(:key_name) { 'devops_ecs' }
   let(:ecs_security_group) { 'sg-01ab1864' }
   let(:ecs_availability_zones) { 'ap-southeast-2a,ap-southeast-2b,ap-southeast-2c' }
-  let(:ecs_subnet_ids) { 'ap-southeast-2a,ap-southeast-2b,ap-southeast-2c' }
+  let(:ecs_subnet_ids) { 'subnet-a479bed3,subnet-45e43d20,subnet-dbf5a49d' }
   let(:cluster_name) { 'test-ecs-cluster' }
   let(:launch_configuration) { "ECS-#{cluster_name}20161201213424098360487nig" }
 end
