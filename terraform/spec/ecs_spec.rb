@@ -1,17 +1,27 @@
 require 'spec_helper'
-require 'test_config'
+require 'cluster_config'
 
-describe ecs_cluster('test-ecs-cluster') do
+describe ecs_cluster do
   include_context 'aws_config'
+  include_context 'cluster_config'
 
-  it { should exist }
-  it { should be_active }
-  it { should_not be_inactive }
-  its(:status) { should eq 'ACTIVE' }
-  its(:cluster_name) { should eq 'test-ecs-cluster' }
-  its(:cluster_arn) { should eq "arn:aws:ecs:#{aws_region}:#{aws_account}:cluster/test-ecs-cluster" }
-  its(:registered_container_instances_count) { should eq 0 }
-  its(:running_tasks_count) { should eq 0 }
-  its(:pending_tasks_count) { should eq 0 }
-  its(:active_services_count) { should eq 0 }
+  subject do
+    Awspec::Type::EcsCluster.new(display_name)
+  end
+
+  describe 'ecs-cluster' do
+    let(:display_name) { cluster_name }
+
+    it { should exist }
+    it { should be_active }
+    it { should_not be_inactive }
+
+    its(:status) { should eq 'ACTIVE' }
+    its(:cluster_name) { should eq cluster_name }
+    its(:cluster_arn) { should eq "arn:aws:ecs:#{aws_region}:#{aws_account}:cluster/#{cluster_name}" }
+    its(:registered_container_instances_count) { should eq 0 }
+    its(:running_tasks_count) { should eq 0 }
+    its(:pending_tasks_count) { should eq 0 }
+    its(:active_services_count) { should eq 0 }
+  end
 end

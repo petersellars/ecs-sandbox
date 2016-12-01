@@ -37,6 +37,8 @@ terraform plan -var-file=cluster.tfvars
 terraform apply -var-file=cluster.tfvars
 ```
 5. Run the tests
+Ensure the `spec/cluster_config.rb` variables are what is expected. These
+should match your `terraform.tfvars`.
 6. Tear down the resources
 Terraform can remove all the resources added.
 

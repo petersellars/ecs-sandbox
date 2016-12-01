@@ -25,3 +25,10 @@ resource "aws_iam_role_policy" "ecs_service_role_policy" {
   policy   = "${file("policies/ecs-service-role-policy.json")}"
   role     = "${aws_iam_role.ecs_service_role.id}"
 }
+
+/* IAM profile to be used in auto-scaling launch configuration */
+resource "aws_iam_instance_profile" "ecs" {
+  name  = "ecs_instance_profile"
+  path  = "/"
+  roles = ["${aws_iam_role.ecs_instance_role.name}"]
+}
