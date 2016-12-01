@@ -11,21 +11,21 @@ to grab the latest version
 tests
 
 ## Usage
-1. Clone the repo
-2. Set the required variables:
+[1] Clone the repo
+[2] Set the required variables:
 ```
 export TF_VAR_key_name=devops-ecs
-export TF_VAR_key_file=~/.ssh/devops-ecs.pem
+export TF_VAR_key_file=~/.ssh/devops-ecs.pub
 export TF_VAR_aws_access_key="AWS_ACCESS_KEY_ID"
 export TF_VAR_aws_secret_key="AWS_SECRET_KEY"
 ```
-3. Set the cluster variables:
+[3] Set the cluster variables:
 Create a cluster.tfvars file based on the `terraform.tfvars` and set your
 cluster variables. The specifications will need to be changed/added based on
 your variables. Remember to use the variables with the Terraform commands
 using the `-var-file=cluster.tfvars` format.
 
-4. Check and Run the plan:
+[4] Check and Run the plan:
 With the default variables in `terraform.tfvars`
 ```
 terraform plan
@@ -36,10 +36,10 @@ With cluster specific variables in `cluster.tfvars`
 terraform plan -var-file=cluster.tfvars
 terraform apply -var-file=cluster.tfvars
 ```
-5. Run the tests
+[5] Run the tests
 Ensure the `spec/cluster_config.rb` variables are what is expected. These
 should match your `terraform.tfvars`.
-6. Tear down the resources
+[6] Tear down the resources
 Terraform can remove all the resources added.
 
 With the default variables
