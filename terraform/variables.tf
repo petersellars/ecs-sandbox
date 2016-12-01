@@ -11,6 +11,17 @@ variable "region" {
   default     = "ap-southeast-2"
 }
 
+/* All availability zones must be within a region */
+variable "availability_zones" {
+  description = "Comma seperated list of EC2 availability zones to launch instances in"
+  default     = ""
+}
+
+variable "subnet_ids" {
+  description = "Comma seperated list of subnet ids, must match availability zones"
+  default     = ""
+}
+
 variable "security_group_ids" {
   description = "Comma seperated list of security group ids"
   default     = ""
@@ -41,6 +52,22 @@ variable "ami" {
 variable "instance_type" {
   default     = "t2.medium"
   description = "AWS instance type"
+}
+
+/* Autoscaling Group */
+variable "min_size" {
+  description = "Minimum number of instances to run in the autoscaling group"
+  default     = "1"
+}
+
+variable "max_size" {
+  description = "Maximum number of instances to run in the group"
+  default     = "5"
+}
+
+variable "desired_capacity" {
+  description = "Desired number of instances to run in the group"
+  default     = "1"
 }
 
 variable "key_name" {

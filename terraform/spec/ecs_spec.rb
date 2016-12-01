@@ -19,7 +19,7 @@ describe ecs_cluster do
     its(:status) { should eq 'ACTIVE' }
     its(:cluster_name) { should eq cluster_name }
     its(:cluster_arn) { should eq "arn:aws:ecs:#{aws_region}:#{aws_account}:cluster/#{cluster_name}" }
-    its(:registered_container_instances_count) { should eq 0 }
+    its(:registered_container_instances_count) { should eq 1 }
     its(:running_tasks_count) { should eq 0 }
     its(:pending_tasks_count) { should eq 0 }
     its(:active_services_count) { should eq 0 }

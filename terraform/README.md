@@ -12,6 +12,7 @@ tests
 
 ## Usage
 [1] Clone the repo
+
 [2] Set the required variables:
 ```
 export TF_VAR_key_name=devops-ecs
@@ -39,6 +40,7 @@ terraform apply -var-file=cluster.tfvars
 [5] Run the tests
 Ensure the `spec/cluster_config.rb` variables are what is expected. These
 should match your `terraform.tfvars`.
+
 [6] Tear down the resources
 Terraform can remove all the resources added.
 
