@@ -16,6 +16,5 @@ describe autoscaling_group do
     its(:min_size) { should eq 1 }
     its(:max_size) { should eq 5 }
     its(:launch_configuration_name) { should eq launch_configuration }
-    
   end
 end

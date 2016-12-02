@@ -32,3 +32,17 @@ resource "aws_iam_instance_profile" "ecs" {
   path  = "/"
   roles = ["${aws_iam_role.ecs_instance_role.name}"]
 }
+
+/* ECS CloudWatch Logs IAM Policy */
+resource "aws_iam_policy" "ecs_cloudwatch_logs" {
+  name        = "ecs_cloudwatch_logs"
+  description = "ECS CloudWatch Logs Policy"
+  policy      = "${file("policies/ecs-cloudwatch-logs-policy.json")}"
+}
+
+/* Attach ECS CloudWatch Logs Policy */
+resource "aws_iam_policy_attachment" "ecs" {
+  name       = "ecs_cloudwatch_logs"
+  roles      = ["${aws_iam_role.ecs_instance_role.name}"]
+  policy_arn = "${aws_iam_policy.ecs_cloudwatch_logs.arn}"
+}
