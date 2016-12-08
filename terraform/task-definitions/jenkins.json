@@ -1,0 +1,30 @@
+[
+  {
+    "name": "jenkins",
+    "image": "${jenkins_docker_image}",
+    "cpu" : 1024,
+    "memory": 2000,
+    "entryPoint": [],
+    "environment": [],
+    "command": [],
+    "portMappings": [
+      {
+        "hostPort": 8080,
+        "containerPort": 8080,
+        "protocol": "tcp"
+      }
+    ],
+    "volumesFrom": [],
+    "links": [],
+    "mountPoints": [],
+    "essential": true,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "awslogs-jenkins",
+        "awslogs-region": "ap-southeast-2",
+        "awslogs-stream-prefix": "jenkins"
+      }
+    }
+  }
+]

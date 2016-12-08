@@ -49,6 +49,11 @@ variable "s3_bucket_name" {
   default     = "lic-ecs"
 }
 
+variable "jenkins_docker_image" {
+  description = "Jenkins Docker image to use"
+  default     = "cato1971/docker-jenkins:latest"
+}
+
 /* ECS optimized AMIs per region */
 variable "amis" {
   /* version 2016.09 */

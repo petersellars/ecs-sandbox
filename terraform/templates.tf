@@ -16,3 +16,12 @@ data "template_file" "ecs_instance_user_data" {
     s3_bucket_name = "${var.s3_bucket_name}"
   }
 }
+
+/* Jenkins Task Container Definition */
+data "template_file" "jenkins_task" {
+  template = "${file("task-definitions/jenkins.json")}"
+
+  vars {
+    jenkins_docker_image = "${var.jenkins_docker_image}"
+  }
+}
