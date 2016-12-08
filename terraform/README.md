@@ -19,6 +19,7 @@ export TF_VAR_key_name=devops-ecs
 export TF_VAR_key_file=~/.ssh/devops-ecs.pub
 export TF_VAR_aws_access_key="AWS_ACCESS_KEY_ID"
 export TF_VAR_aws_secret_key="AWS_SECRET_KEY"
+export TF_VAR_ecs_engine_auth="DOCKERHUB_AUTH_TOKEN"
 ```
 [3] Set the cluster variables:
 Create a cluster.tfvars file based on the `terraform.tfvars` and set your

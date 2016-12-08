@@ -4,6 +4,7 @@ data "template_file" "ecs_config" {
 
   vars {
     ecs_cluster_name = "${var.ecs_cluster_name}"
+    ecs_engine_auth  = "${var.ecs_engine_auth}"
   }
 }
 

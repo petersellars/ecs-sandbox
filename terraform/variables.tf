@@ -6,6 +6,18 @@ variable "aws_secret_key" {
   description = "AWS Secret Key"
 }
 
+variable "key_name" {
+  description = "AWS SSH Key Name"
+}
+
+variable "key_file" {
+  description = "AWS SSH Public Key file"
+} 
+
+variable "ecs_engine_auth" {
+  description = "ECS Engine Auth Token"
+}
+
 variable "region" {
   description = "AWS region to create resources in"
   default     = "ap-southeast-2"
@@ -73,14 +85,4 @@ variable "max_size" {
 variable "desired_capacity" {
   description = "Desired number of instances to run in the group"
   default     = "1"
-}
-
-variable "key_name" {
-  description = "AWS SSH Key Name"
-  default = ""
-}
-
-variable "key_file" {
-  description = "AWSH SSH Public Key file"
-  default = ""
 }
