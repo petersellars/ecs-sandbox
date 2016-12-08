@@ -32,6 +32,11 @@ variable "ecs_cluster_name" {
   default     = "default"
 }
 
+variable "s3_bucket_name" {
+  description = "Name of the S3 configuration bucket"
+  default     = "lic-ecs"
+}
+
 /* ECS optimized AMIs per region */
 variable "amis" {
   /* version 2016.09 */

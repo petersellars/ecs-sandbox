@@ -4,7 +4,8 @@ MIME-Version: 1.0
 --==BOUNDARY==
 Content-Type: text/x-shellscript; charset="us-ascii"
 #!/bin/bash
-echo ECS_CLUSTER=${ecs_cluster_name} > /etc/ecs/ecs.config
+yum install -y aws-cli
+aws s3 cp s3://${s3_bucket_name}/ecs.config /etc/ecs/ecs.config
 
 --==BOUNDARY==
 MIME-Version: 1.0

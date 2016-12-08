@@ -49,3 +49,7 @@ output "autoscaling.vpc_zone_identifier" {
 output "autoscaling.load_balancers" {
   value = "${aws_autoscaling_group.ecs.load_balancers}"
 }
+
+output "ecs_config.version_id" {
+  value = "${aws_s3_bucket_object.ecs_config.version_id}"
+}

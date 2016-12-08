@@ -13,6 +13,12 @@ resource "aws_iam_role_policy" "ecs_instance_role_policy" {
   role     = "${aws_iam_role.ecs_instance_role.id}"
 }
 
+/* Attach S3 Read-Only Access Policy to Container Instance Role */
+resource "aws_iam_role_policy_attachment" "ecs_instance_s3" {
+  role       = "${aws_iam_role.ecs_instance_role.name}"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess" 
+}
+
 /* ECS Service Scheduler Role */
 resource "aws_iam_role" "ecs_service_role" {
   name               = "ecs_service_role"
@@ -40,9 +46,8 @@ resource "aws_iam_policy" "ecs_cloudwatch_logs" {
   policy      = "${file("policies/ecs-cloudwatch-logs-policy.json")}"
 }
 
-/* Attach ECS CloudWatch Logs Policy */
-resource "aws_iam_policy_attachment" "ecs" {
-  name       = "ecs_cloudwatch_logs"
-  roles      = ["${aws_iam_role.ecs_instance_role.name}"]
+/* Attach ECS CloudWatch Logs Policy to Container Instance Role */
+resource "aws_iam_role_policy_attachment" "ecs" {
+  role       = "${aws_iam_role.ecs_instance_role.name}"
   policy_arn = "${aws_iam_policy.ecs_cloudwatch_logs.arn}"
 }

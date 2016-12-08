@@ -11,5 +11,5 @@ RSpec.shared_context 'cluster_config', a: :b do
   let(:ecs_availability_zones) { 'ap-southeast-2a,ap-southeast-2b,ap-southeast-2c' }
   let(:ecs_subnet_ids) { 'subnet-a479bed3,subnet-45e43d20,subnet-dbf5a49d' }
   let(:cluster_name) { 'test-ecs-cluster' }
-  let(:launch_configuration) { "ECS-#{cluster_name}-20161202033426829907621vlx" }
+  let(:launch_configuration) { "ECS-#{cluster_name}-20161208001915681978140do4" }
 end

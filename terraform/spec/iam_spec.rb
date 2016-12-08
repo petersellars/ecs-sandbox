@@ -4,10 +4,11 @@ require 'cluster_config'
 describe iam_role('ecs_instance_role') do
   it { should exist }
   it { should have_inline_policy('ecs_instance_role_policy') }
+  it { should have_iam_policy('ecs_cloudwatch_logs') }
+  it { should have_iam_policy('AmazonS3ReadOnlyAccess') }
 end
 
 describe iam_role('ecs_instance_role') do
-  it { should have_iam_policy('ecs_cloudwatch_logs') }
   it { should be_allowed_action('ecs:CreateCluster') }
   it { should be_allowed_action('ecs:DeregisterContainerInstance') }
   it { should be_allowed_action('ecs:DiscoverPollEndpoint') }
@@ -19,6 +20,8 @@ describe iam_role('ecs_instance_role') do
   it { should be_allowed_action('logs:CreateLogStream') }
   it { should be_allowed_action('logs:PutLogEvents') }
   it { should be_allowed_action('logs:DescribeLogStreams').resource_arn('arn:aws:logs:*:*:*') }
+  it { should be_allowed_action('s3:Get*') }
+  it { should be_allowed_action('s3:List*') }
 end
 
 describe iam_role('ecs_service_role') do
