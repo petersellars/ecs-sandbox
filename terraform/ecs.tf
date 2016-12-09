@@ -5,7 +5,8 @@ resource "aws_ecs_cluster" "ecs" {
 
 /* ECS S3 bucket */
 resource "aws_s3_bucket" "ecs" {
-  bucket = "${var.s3_bucket_name}"
+  bucket        = "${var.s3_bucket_name}"
+  force_destroy = true
   
   versioning {
     enabled = true
@@ -32,8 +33,10 @@ resource "aws_autoscaling_group" "ecs" {
   min_size             = "${var.min_size}"
   max_size             = "${var.max_size}"
   desired_capacity     = "${var.desired_capacity}"
-
+  
   lifecycle {
     create_before_destroy = true
   }
+
+  depends_on           = ["aws_s3_bucket.ecs"]
 }

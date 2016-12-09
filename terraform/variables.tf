@@ -29,6 +29,11 @@ variable "availability_zones" {
   default     = ""
 }
 
+variable "vpc" {
+  description = "VPC used"
+  default     = ""
+}
+
 variable "subnet_ids" {
   description = "Comma seperated list of subnet ids, must match availability zones"
   default     = ""

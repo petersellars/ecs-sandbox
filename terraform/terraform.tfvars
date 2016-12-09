@@ -1,5 +1,8 @@
 # Terraform variables
-# terraform.tfvars is picked up by default
+# terraform.tfvars is picked up by defaulti
+
+# VPC
+vpc = "vpc-deea28bb"
 
 # Security Groups (Comma Seperated)
 security_group_ids = "sg-01ab1864"
