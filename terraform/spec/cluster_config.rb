@@ -7,6 +7,7 @@ end
 
 RSpec.shared_context 'cluster_config', a: :b do
   let(:key_name) { 'devops_ecs' }
+  let(:vpc_id) { 'vpc-8e9e5bea' }
   let(:ecs_security_group) { 'sg-bc8a65db' }
   let(:ecs_availability_zones) { 'ap-southeast-2a,ap-southeast-2b,ap-southeast-2c' }
   let(:ecs_subnet_ids) { 'subnet-a479bed3,subnet-45e43d20,subnet-dbf5a49d' }

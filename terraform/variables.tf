@@ -29,6 +29,16 @@ variable "availability_zones" {
   default     = ""
 }
 
+variable "private_subnets" {
+  description = "Private VPC Subnets"
+  default     = ["10.10.1.0/24","10.10.2.0/24","10.10.3.0/24"]
+}
+
+variable "public_subnets" {
+  description = "Public VPC Subnets"
+  default     = ["10.10.101.0/24","10.10.102.0/24","10.10.103.0/24"]
+}
+
 variable "vpc" {
   description = "VPC used"
   default     = ""
