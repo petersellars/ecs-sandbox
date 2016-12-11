@@ -3,7 +3,7 @@ resource "aws_alb_target_group" "jenkins" {
   name     = "jenkins-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "${var.vpc}"
+  vpc_id   = "${aws_vpc.ecs.id}"
 
   health_check {
     healthy_threshold   = 2
@@ -19,7 +19,7 @@ resource "aws_alb_target_group" "jenkins" {
 resource "aws_alb" "jenkins" {
   name            = "jenkins-alb"
   internal        = false
-  subnets         = ["${split(",", var.subnet_ids)}"]
+  subnets         = ["${aws_subnet.ecs_public.*.id}"]
 }
 
 /* Jenkins ALB Listener */

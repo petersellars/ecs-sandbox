@@ -12,6 +12,12 @@ resource "aws_vpc" "ecs" {
   }
 }
 
+resource "aws_vpc_endpoint" "private-s3" {
+  vpc_id          = "${aws_vpc.ecs.id}"
+  service_name    = "com.amazonaws.ap-southeast-2.s3"
+  route_table_ids = ["${aws_route_table.ecs_private.*.id}"]
+}
+
 output "vpc_id" {
   value = "${aws_vpc.ecs.id}"
 }
