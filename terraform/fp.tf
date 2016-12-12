@@ -33,10 +33,28 @@ module "ecs_prod_cluster" {
 
 /*
 module "ecs_accp_cluster" {
-  source = "./ecs_cluster"
-  name   = "LicNZ-FP-Accp"
+  source              = "./ecs_cluster"
+  environment         = "Acceptance"
+  name                = "LicNZ-FP-Accp"
+  vpc_id              = "{module.vpc.vpc_id}"
+  key_name            = "${var.key_name}"
+  key_file            = "${var.key_file}"
+  s3_bucket_name      = "lic-ecs-accp"
+  availability_zone   = ["ap-southeast-2a", "ap-southeast-2b"]
+  image_id            = "${lookup(var.amis, var.region)}"
+  vpc_zone_identifier = ["${module.vpc.private_subnets}"]
+  ecs_engine_auth     = "${var.ecs_engine_auth}"
 }
 */
+
+module "ecs_alb" {
+  source             = "./alb"
+  name               = "ecs-alb"
+  vpc_id             = "${module.vpc.vpc_id}"
+  subnets            = ["${module.vpc.public_subnets}"]
+  target_group       = "LicNZ-FP-Target-Group"
+  certificate_domain = "*.catosplace.biz"
+}
 
 /*
 module "fp-identity-service" {

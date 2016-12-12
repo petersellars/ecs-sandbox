@@ -32,7 +32,3 @@ output "lic_nat_eips" {
 output "lic_public_subnets" {
   value = "${module.vpc.public_subnets}"
 }
-
-output "domain_certificate_arn" {
-  value = "${data.aws_acm_certificate.domain.arn}"
-}
