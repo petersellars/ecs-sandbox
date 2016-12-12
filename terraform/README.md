@@ -27,7 +27,14 @@ cluster variables. The specifications will need to be changed/added based on
 your variables. Remember to use the variables with the Terraform commands
 using the `-var-file=cluster.tfvars` format.
 
-[4] Check and Run the plan:
+[4] Get the Local Terraform Modules
+In order to run the plan you will need to import the local Terraform modules
+used by this repository. Simply run:
+```
+terraform get
+```
+
+[5] Check and Run the plan:
 With the default variables in `terraform.tfvars`
 ```
 terraform plan
@@ -38,11 +45,11 @@ With cluster specific variables in `cluster.tfvars`
 terraform plan -var-file=cluster.tfvars
 terraform apply -var-file=cluster.tfvars
 ```
-[5] Run the tests
+[6] Run the tests
 Ensure the `spec/cluster_config.rb` variables are what is expected. These
 should match your `terraform.tfvars`.
 
-[6] Tear down the resources
+[7] Tear down the resources
 Terraform can remove all the resources added.
 
 With the default variables
@@ -76,7 +83,8 @@ AWS_PROFILE=terraform_ecs bundle exec rake spec
 ### Terraform User & AWS ECS Key Pair
 Set up an AWS user called `terraform_ecs` with  AmazonEC2FullAccess, 
 AmazonEC2ContainerServiceFullAccess, AmazonS3FullAccess, CloudWatchFullAccess 
-and IAMFullAccess permissions. The user does not need console access.
+AWSCertificateManagerReadOnly, AmazonRoute53FullAccess and IAMFullAccess 
+permissions. The user does not need console access.
 
 Create a Key Pair for use with the Terraform plan. Name it `devops-ecs` and
 store the .pem file in a secure location.

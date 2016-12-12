@@ -17,17 +17,28 @@ resource "aws_vpc_endpoint" "private-s3" {
   route_table_ids = ["${module.vpc.private_route_table_ids}"]
 }
 
-/*
 module "ecs_prod_cluster" {
-  source = "./ecs_cluster"
-  name   = "LicNZ-FP-Prod"
+  source              = "./ecs_cluster"
+  environment         = "Production"
+  name                = "LicNZ-FP-Prod"
+  vpc_id              = "${module.vpc.vpc_id}"
+  key_name            = "${var.key_name}"
+  key_file            = "${var.key_file}"
+  s3_bucket_name      = "lic-ecs-prod"
+  availability_zones  = ["ap-southeast-2a", "ap-southeast-2b"]
+  image_id            = "${lookup(var.amis, var.region)}"
+  vpc_zone_identifier = ["${module.vpc.private_subnets}"]
+  ecs_engine_auth     = "${var.ecs_engine_auth}"
 }
 
+/*
 module "ecs_accp_cluster" {
   source = "./ecs_cluster"
   name   = "LicNZ-FP-Accp"
 }
+*/
 
+/*
 module "fp-identity-service" {
   source = "./fp-service"
   name   = "identity"

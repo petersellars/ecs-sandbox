@@ -15,6 +15,12 @@ resource "aws_alb_target_group" "jenkins" {
 
 }
 
+/* SSL Certificate */
+data "aws_acm_certificate" "domain" {
+  domain   = "*.catosplace.biz"
+  statuses = ["ISSUED"]
+}
+
 /* Jenkins ALB */
 resource "aws_alb" "jenkins" {
   name            = "jenkins-alb"
@@ -22,10 +28,13 @@ resource "aws_alb" "jenkins" {
   subnets         = ["${module.vpc.public_subnets}"]
 }
 
-/* Jenkins ALB Listener */
-resource "aws_alb_listener" "jenkins" {
+/* Jenkins ALB HTTPS Listener */
+resource "aws_alb_listener" "jenkins-https" {
   load_balancer_arn = "${aws_alb.jenkins.arn}"
-  port              = "80"
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2015-05"
+  certificate_arn   = "${data.aws_acm_certificate.domain.arn}"
 
   default_action {
     target_group_arn = "${aws_alb_target_group.jenkins.arn}"
@@ -36,18 +45,16 @@ resource "aws_alb_listener" "jenkins" {
 /* Jenkins Service */
 resource "aws_ecs_service" "jenkins-alb" {
   name            = "jenkins-alb"
-  cluster         = "${aws_ecs_cluster.ecs.id}"
+  cluster         = "${module.ecs_prod_cluster.cluster_id}"
   task_definition = "${aws_ecs_task_definition.jenkins.arn}"
   desired_count   = 1
-  iam_role        = "${aws_iam_role.ecs_service_role.arn}"
+  iam_role        = "${module.ecs_prod_cluster.ecs_service_role_arn}"
 
   load_balancer {
     target_group_arn = "${aws_alb_target_group.jenkins.arn}"
     container_name   = "jenkins"
     container_port   = 8080
   }
-
-  depends_on      = ["aws_iam_role_policy.ecs_service_role_policy"]
 }
 
 /* Jenkins Task Definition */
@@ -61,4 +68,13 @@ resource "aws_ecs_task_definition" "jenkins" {
 /* Add CloudWatch log group */
 resource "aws_cloudwatch_log_group" "jenkins" {
   name = "awslogs-jenkins"
+}
+
+/* Route53 */
+resource "aws_route53_record" "www" {
+  zone_id = "${var.hosted_zone_id}"
+  name    = "sandbox.catosplace.biz"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${aws_alb.jenkins.dns_name}"]
 }
