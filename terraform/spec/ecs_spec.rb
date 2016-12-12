@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'cluster_config'
 
 describe ecs_cluster do
   include_context 'aws_config'

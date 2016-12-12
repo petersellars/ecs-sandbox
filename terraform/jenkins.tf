@@ -3,7 +3,7 @@ resource "aws_alb_target_group" "jenkins" {
   name     = "jenkins-tg"
   port     = 80
   protocol = "HTTP"
-  vpc_id   = "${aws_vpc.ecs.id}"
+  vpc_id   = "${module.vpc.vpc_id}"
 
   health_check {
     healthy_threshold   = 2
@@ -19,7 +19,7 @@ resource "aws_alb_target_group" "jenkins" {
 resource "aws_alb" "jenkins" {
   name            = "jenkins-alb"
   internal        = false
-  subnets         = ["${aws_subnet.ecs_public.*.id}"]
+  subnets         = ["${module.vpc.public_subnets}"]
 }
 
 /* Jenkins ALB Listener */
@@ -31,12 +31,11 @@ resource "aws_alb_listener" "jenkins" {
     target_group_arn = "${aws_alb_target_group.jenkins.arn}"
     type             = "forward"
   }
-
 }
 
 /* Jenkins Service */
-resource "aws_ecs_service" "jenkins-elb" {
-  name            = "jenkins-elb"
+resource "aws_ecs_service" "jenkins-alb" {
+  name            = "jenkins-alb"
   cluster         = "${aws_ecs_cluster.ecs.id}"
   task_definition = "${aws_ecs_task_definition.jenkins.arn}"
   desired_count   = 1

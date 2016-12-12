@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'cluster_config'
 
 describe iam_role('ecs_instance_role') do
   it { should exist }

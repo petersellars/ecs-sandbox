@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'cluster_config'
 
 describe autoscaling_group do
   include_context 'cluster_config'

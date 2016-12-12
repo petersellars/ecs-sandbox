@@ -28,8 +28,8 @@ resource "aws_s3_bucket_object" "ecs_config" {
 resource "aws_autoscaling_group" "ecs" {
   name                 = "ecs-asg"
   launch_configuration = "${aws_launch_configuration.ecs.name}"
-  availability_zones   = ["${split(",", var.availability_zones)}"]
-  vpc_zone_identifier  = ["${aws_subnet.ecs_private.*.id}"]
+  availability_zones   = ["ap-southeast-2a","ap-southeast-2b"]
+  vpc_zone_identifier  = ["${module.vpc.private_subnets}"]
   min_size             = "${var.min_size}"
   max_size             = "${var.max_size}"
   desired_capacity     = "${var.desired_capacity}"
