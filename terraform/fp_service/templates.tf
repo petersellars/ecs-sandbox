@@ -7,5 +7,9 @@ data "template_file" "task_definition" {
     image       = "${var.image}"
     port        = "${var.port}"
     environment = "${var.environment}"
+    db_username = "${aws_db_instance.service.username}"
+    db_password = "${var.db_password}"
+    db_address  = "${aws_db_instance.service.address}"
+    db_name     = "${aws_db_instance.service.name}"
   }
 }

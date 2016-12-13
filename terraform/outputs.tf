@@ -32,3 +32,12 @@ output "lic_nat_eips" {
 output "lic_public_subnets" {
   value = "${module.vpc.public_subnets}"
 }
+
+/* RDS Information */
+output "identity_service_instance_id" {
+  value = "${module.fp-identity-service.rds_instance_id}"
+}
+
+output "identity_service_instance_address" {
+  value = "${module.fp-identity-service.rds_instance_address}"
+}

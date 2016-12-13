@@ -23,11 +23,6 @@ variable "region" {
   default     = "ap-southeast-2"
 }
 
-variable "jenkins_docker_image" {
-  description = "Jenkins Docker image to use"
-  default     = "cato1971/docker-jenkins:latest"
-}
-
 /* ECS optimized AMIs per region */
 variable "amis" {
   /* version 2016.09 */
@@ -52,4 +47,8 @@ variable "instance_type" {
 
 variable "hosted_zone_id" {
   description = "Hosted zone to add DNS record to"
+}
+
+variable "identity_db_password" {
+  description = "Identity Service DB Password"
 }

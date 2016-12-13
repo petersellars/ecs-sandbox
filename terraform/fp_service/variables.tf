@@ -18,8 +18,22 @@ variable "vpc_id" {
   description = "VPC to create resources in"
 }
 
+variable "hc_path" {
+  decription = "Health check path"
+  default    = "/"
+}
+
 variable "port" {
   description = "Port used by Image"
+}
+
+variable "db_password" {
+  description = "DB Password to set for RDS instance"
+}
+
+variable "private_subnets" {
+  description = "Private Subnets for RDS instances"
+  default     = []
 }
 
 variable "cluster_id" {

@@ -83,8 +83,8 @@ AWS_PROFILE=terraform_ecs bundle exec rake spec
 ### Terraform User & AWS ECS Key Pair
 Set up an AWS user called `terraform_ecs` with  AmazonEC2FullAccess, 
 AmazonEC2ContainerServiceFullAccess, AmazonS3FullAccess, CloudWatchFullAccess 
-AWSCertificateManagerReadOnly, AmazonRoute53FullAccess and IAMFullAccess 
-permissions. The user does not need console access.
+AWSCertificateManagerReadOnly, AmazonRoute53FullAccess, AmazonRDSFullAccess
+and IAMFullAccess permissions. The user does not need console access.
 
 Create a Key Pair for use with the Terraform plan. Name it `devops-ecs` and
 store the .pem file in a secure location.

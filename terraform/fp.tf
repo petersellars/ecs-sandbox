@@ -21,7 +21,7 @@ module "ecs_prod_cluster" {
   source              = "./ecs_cluster"
   environment         = "Production"
   name                = "Catosplace-Prod"
-  registry            = "index.docker.io/v1/"
+  registry            = "registry.gitlab.com" 
   vpc_id              = "${module.vpc.vpc_id}"
   key_name            = "${var.key_name}"
   key_file            = "${var.key_file}"
@@ -68,9 +68,12 @@ module "fp-identity-service" {
   environment            = "Production"
   name                   = "identity-service"
   family                 = "identity-service"
-  image                  = "cato1971/docker-jenkins:latest"
-  port                   = "8080"
+  image                  = "registry.gitlab.com/lic-nz/identity:latest"
+  port                   = "5000"
+  hc_path                = "/users/sign_in"
+  db_password            = "${var.identity_db_password}"
   vpc_id                 = "${module.vpc.vpc_id}"
+  private_subnets        = "${module.vpc.private_subnets}"
   cluster_id             = "${module.ecs_prod_cluster.cluster_id}"
   ecs_service_role       = "${module.ecs_prod_cluster.ecs_service_role_arn}"
   load_balancer          = "${module.ecs_prod_alb.alb_arn}"
@@ -80,3 +83,14 @@ module "fp-identity-service" {
   route53_domain         = "sandbox.catosplace.biz"
 }
 
+module "bastion" {
+  source                      = "./bastion"
+  instance_type               = "t2.micro"
+  ami                         = "ami-90724af3"
+  region                      = "ap-southeast-2"
+  s3_bucket_name              = "fp-bastion-keys-bucket"
+  vpc_id                      = "${module.vpc.vpc_id}"
+  subnet_ids                  = ["${module.vpc.public_subnets}"]
+  keys_update_frequency       = "5,20,35,50 * * * *"
+  additional_user_data_script = "date"
+}
