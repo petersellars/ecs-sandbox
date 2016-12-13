@@ -10,6 +10,10 @@ variable "vpc_id" {
   description = "VPC in which to create the cluster"
 }
 
+variable "registry" {
+  description = "ECS Config Registry locator"
+}
+
 variable "image_id" {
   description = "AMI image ID for use in launch configuration"
 }

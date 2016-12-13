@@ -1,7 +1,7 @@
 /* VPC */
 module "vpc" {
   source                  = "./vpc"
-  name                    = "LicNZ-Farm-Performance"
+  name                    = "Catosplace-ECS-Sandbox"
   cidr                    = "10.10.0.0/16"
   private_subnets         = ["10.10.1.0/24", "10.10.2.0/24"]
   public_subnets          = ["10.10.101.0/24", "10.10.102.0/24"]
@@ -20,7 +20,8 @@ resource "aws_vpc_endpoint" "private-s3" {
 module "ecs_prod_cluster" {
   source              = "./ecs_cluster"
   environment         = "Production"
-  name                = "LicNZ-FP-Prod"
+  name                = "Catosplace-Prod"
+  registry            = "index.docker.io/v1/"
   vpc_id              = "${module.vpc.vpc_id}"
   key_name            = "${var.key_name}"
   key_file            = "${var.key_file}"
@@ -35,7 +36,8 @@ module "ecs_prod_cluster" {
 module "ecs_accp_cluster" {
   source              = "./ecs_cluster"
   environment         = "Acceptance"
-  name                = "LicNZ-FP-Accp"
+  name                = "Catosplace-Accp"
+  registry            = "index.docker.io/v1/"
   vpc_id              = "{module.vpc.vpc_id}"
   key_name            = "${var.key_name}"
   key_file            = "${var.key_file}"
@@ -47,18 +49,34 @@ module "ecs_accp_cluster" {
 }
 */
 
-module "ecs_alb" {
-  source             = "./alb"
-  name               = "ecs-alb"
-  vpc_id             = "${module.vpc.vpc_id}"
-  subnets            = ["${module.vpc.public_subnets}"]
-  target_group       = "LicNZ-FP-Target-Group"
-  certificate_domain = "*.catosplace.biz"
+module "ecs_prod_alb" {
+  source                        = "./alb"
+  environment                   = "Production"
+  name                          = "ecs-prod-alb"
+  vpc_id                        = "${module.vpc.vpc_id}"
+  vpc_default_security_group_id = "${module.vpc.default_security_group_id}"
+  subnets                       = ["${module.vpc.public_subnets}"]
 }
 
-/*
+/**
+ * Services 
+ *   - Seperate Infrastructure from Application Deployment 
+ **/
+
 module "fp-identity-service" {
-  source = "./fp-service"
-  name   = "identity"
+  source                 = "./fp_service"
+  environment            = "Production"
+  name                   = "identity-service"
+  family                 = "identity-service"
+  image                  = "cato1971/docker-jenkins:latest"
+  port                   = "8080"
+  vpc_id                 = "${module.vpc.vpc_id}"
+  cluster_id             = "${module.ecs_prod_cluster.cluster_id}"
+  ecs_service_role       = "${module.ecs_prod_cluster.ecs_service_role_arn}"
+  load_balancer          = "${module.ecs_prod_alb.alb_arn}"
+  load_balancer_dns_name = "${module.ecs_prod_alb.dns_name}"
+  certificate_domain     = "*.catosplace.biz"
+  hosted_zone_id         = "${var.hosted_zone_id}"
+  route53_domain         = "sandbox.catosplace.biz"
 }
-*/
+

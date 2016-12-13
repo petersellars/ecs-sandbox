@@ -3,6 +3,7 @@ data "template_file" "ecs_config" {
   template = "${file("${path.module}/templates/ecs-config.tpl")}"
 
   vars {
+    registry         = "${var.registry}"
     ecs_cluster_name = "${var.name}"
     ecs_engine_auth  = "${var.ecs_engine_auth}"
   }
