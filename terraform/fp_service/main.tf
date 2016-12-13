@@ -33,7 +33,7 @@ resource "aws_alb_target_group" "mod" {
     unhealthy_threshold = 2
     timeout             = 5 
     path                = "${var.hc_path}"
-    port                = "${var.port}"
+    port                = "traffic-port"
     interval            = 30
   }
 }
