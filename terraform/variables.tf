@@ -49,6 +49,28 @@ variable "hosted_zone_id" {
   description = "Hosted zone to add DNS record to"
 }
 
+/* IDENTITY SERVICE */
+
 variable "identity_db_password" {
   description = "Identity Service DB Password"
+}
+
+variable "aes_key" {
+  default = ""
+}
+
+variable "identity_jwt_private_key" {
+  default = ""
+}
+
+variable "identity_jwt_public_key" {
+  default = ""
+}
+
+variable "aes_iv" {
+  default = ""
+}
+
+variable "secret_key_base" {
+
 }

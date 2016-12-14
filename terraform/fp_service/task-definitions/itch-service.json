@@ -3,10 +3,10 @@
     "name": "${name}",
     "image": "${image}",
     "cpu" : 0,
-    "memory": 500,
-    "entryPoint": null,
+    "memory": 128,
+    "entryPoint": [],
     "environment": [],
-    "command": null,
+    "command": [],
     "portMappings": [
       {
         "hostPort": 0,
@@ -15,7 +15,7 @@
       }
     ],
     "volumesFrom": [],
-    "links": null,
+    "links": [],
     "mountPoints": [],
     "essential": true,
     "logConfiguration": {

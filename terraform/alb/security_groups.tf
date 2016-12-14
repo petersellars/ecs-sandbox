@@ -24,4 +24,3 @@ resource "aws_security_group" "allow_https" {
     Name = "allow_https"
   }
 }
-

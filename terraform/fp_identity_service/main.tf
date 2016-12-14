@@ -1,7 +1,7 @@
 /* Task Definition */
 resource "aws_ecs_task_definition" "mod" {
   family                = "${var.family}"
-  container_definitions = "${data.template_file.task-definition.rendered}"
+  container_definitions = "${data.template_file.task_definition.rendered}"
   
   depends_on            = ["aws_db_instance.service","aws_cloudwatch_log_group.mod"]
 }

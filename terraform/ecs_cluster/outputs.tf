@@ -8,6 +8,10 @@ output "ecs_service_role_arn" {
   value = "${aws_iam_role.ecs_service_role.arn}"
 }
 
+output "rds_ecs_sg_id" {
+  value = "${aws_security_group.ecs_rds.id}"
+}
+
 /* Launch Configuration Information */
 output "launch_configuration.id" {
   value = "${aws_launch_configuration.ecs.id}"

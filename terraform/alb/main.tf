@@ -10,3 +10,12 @@ resource "aws_alb" "mod" {
     Environment = "${var.environment}"
   }
 }
+
+/* Route DNS to the ALB */
+resource "aws_route53_record" "mod" {
+  zone_id = "${var.hosted_zone_id}"
+  name    = "${var.route53_domain}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["${aws_alb.mod.dns_name}"]
+}

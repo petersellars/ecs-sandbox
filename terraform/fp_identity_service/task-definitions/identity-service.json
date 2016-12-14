@@ -1,0 +1,75 @@
+[
+  {
+    "name": "${name}",
+    "image": "${image}",
+    "cpu" : 0,
+    "memory": 500,
+    "entryPoint": null,
+    "environment": [
+      {
+        "name": "AES_IV",
+        "value": "${aes_iv}"
+      },
+      {
+        "name": "AES_KEY",
+        "value": "${aes_key}"
+      },
+      {
+        "name": "DATABASE_URL",
+        "value" : "postgres://${db_username}:${db_password}@${db_address}/${db_name}"
+      },
+      {
+        "name": "DEFAULT_DOMAIN",
+        "value": "${default_domain}"
+      },
+      {
+        "name": "IDENTITY_JWT_PRIVATE_KEY",
+        "value": "${identity_jwt_private_key}"
+      },
+      {
+        "name": "IDENTITY_JWT_PUBLIC_KEY",
+        "value": "${identity_jwt_public_key}"
+      },
+      {
+        "name": "LOG_LEVEL",
+        "value": "${log_level}"
+      },
+      {
+        "name": "RAILS_ENV",
+        "value": "${rails_env}"
+      },
+      {
+        "name": "RAILS_SERVE_STATIC_FILES",
+        "value": "true"
+      },
+      {
+        "name": "SECRET_KEY_BASE",
+        "value": "${secret_key_base}"
+      },
+      {
+        "name": "TOKEN_ISS",
+        "value": "${token_iss}"
+      }
+    ],
+    "command": null,
+    "portMappings": [
+      {
+        "hostPort": 0,
+        "containerPort": ${port},
+        "protocol": "tcp"
+      }
+    ],
+    "volumesFrom": [],
+    "links": null,
+    "mountPoints": [],
+    "essential": true,
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "awslogs-${name}",
+        "awslogs-region": "ap-southeast-2",
+        "awslogs-stream-prefix": "${environment}"
+      }
+    }
+  }
+]

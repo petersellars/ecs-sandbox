@@ -6,6 +6,34 @@ variable "environment" {
   description = "Environment label"
 }
 
+/** Environment Variables **/
+variable "aes_iv" {
+}
+
+variable "aes_key" {
+}
+
+variable "identity_jwt_private_key" {
+}
+
+variable "identity_jwt_public_key" {
+}
+
+variable "secret_key_base" {
+}
+
+variable "default_domain" {
+}
+
+variable "log_level" {
+}
+
+variable "rails_env" {
+}
+
+variable "token_iss" {
+}
+
 variable "family" {
   description = "Task Definition Family Name "
 }

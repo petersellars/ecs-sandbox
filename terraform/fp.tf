@@ -56,6 +56,8 @@ module "ecs_prod_alb" {
   vpc_id                        = "${module.vpc.vpc_id}"
   vpc_default_security_group_id = "${module.vpc.default_security_group_id}"
   subnets                       = ["${module.vpc.public_subnets}"]
+  hosted_zone_id         = "${var.hosted_zone_id}"
+  route53_domain         = "sandbox.catosplace.biz"
 }
 
 /**
@@ -64,24 +66,57 @@ module "ecs_prod_alb" {
  **/
 
 module "fp-identity-service" {
-  source                 = "./fp_service"
-  environment            = "Production"
-  name                   = "identity-service"
-  family                 = "identity-service"
-  image                  = "registry.gitlab.com/lic-nz/identity:latest"
-  port                   = "5000"
-  hc_path                = "/users/sign_in"
-  db_password            = "${var.identity_db_password}"
-  vpc_id                 = "${module.vpc.vpc_id}"
-  private_subnets        = "${module.vpc.private_subnets}"
-  cluster_id             = "${module.ecs_prod_cluster.cluster_id}"
-  ecs_service_role       = "${module.ecs_prod_cluster.ecs_service_role_arn}"
-  load_balancer          = "${module.ecs_prod_alb.alb_arn}"
-  load_balancer_dns_name = "${module.ecs_prod_alb.dns_name}"
-  certificate_domain     = "*.catosplace.biz"
-  hosted_zone_id         = "${var.hosted_zone_id}"
-  route53_domain         = "sandbox.catosplace.biz"
+  source                   = "./fp_identity_service"
+  environment              = "Production"
+  name                     = "identity-service"
+  family                   = "identity-service"
+  image                    = "registry.gitlab.com/lic-nz/identity-service:latest"
+
+  port                     = "5000"
+  aes_iv                   = "${var.aes_iv}"
+  aes_key                  = "${var.aes_key}"
+  identity_jwt_private_key = "${var.identity_jwt_private_key}"
+  identity_jwt_public_key  = "${var.identity_jwt_public_key}"
+  secret_key_base          = "${var.secret_key_base}"
+  port                     = "8000"
+  default_domain           = "accp.mindainfo.io"
+  log_level                = "debug"
+  rails_env                = "uat"
+  token_iss                = "https://identity.accp.mindainfo.io"
+
+  hc_path                  = "/users/sign_in"
+  db_password              = "${var.identity_db_password}"
+  vpc_id                   = "${module.vpc.vpc_id}"
+  private_subnets          = "${module.vpc.private_subnets}"
+  rds_ecs_sg_id            = "${module.ecs_prod_cluster.rds_ecs_sg_id}"
+  cluster_id               = "${module.ecs_prod_cluster.cluster_id}"
+  ecs_service_role         = "${module.ecs_prod_cluster.ecs_service_role_arn}"
+  load_balancer            = "${module.ecs_prod_alb.alb_arn}"
+  load_balancer_dns_name   = "${module.ecs_prod_alb.dns_name}"
+  certificate_domain       = "*.catosplace.biz"
 }
+
+/*
+module "fp-itch-service" {
+  source                   = "./fp_itch_service"
+  environment              = "Production"
+  name                     = "itch-service"
+  family                   = "itch-service"
+  image                    = "registry.gitlab.com/lic-nz/itch-service:latest"
+  port                     = "8000"
+  hc_path                  = "/"
+  db_password              = "${var.identity_db_password}"
+  vpc_id                   = "${module.vpc.vpc_id}"
+  private_subnets          = "${module.vpc.private_subnets}"
+  cluster_id               = "${module.ecs_prod_cluster.cluster_id}"
+  ecs_service_role         = "${module.ecs_prod_cluster.ecs_service_role_arn}"
+  load_balancer            = "${module.ecs_prod_alb.alb_arn}"
+  load_balancer_dns_name   = "${module.ecs_prod_alb.dns_name}"
+  certificate_domain       = "*.catosplace.biz"
+  hosted_zone_id           = "${var.hosted_zone_id}"
+  route53_domain           = "sandbox.catosplace.biz"
+}
+*/
 
 module "bastion" {
   source                      = "./bastion"

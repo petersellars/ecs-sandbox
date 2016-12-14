@@ -23,6 +23,8 @@ resource "aws_s3_bucket_object" "ecs_config" {
   bucket  = "${aws_s3_bucket.ecs.bucket}"
   key     = "ecs.config"
   content = "${data.template_file.ecs_config.rendered}"
+
+  depends_on = ["aws_s3_bucket.ecs"]
 }
 
 /* SSH Key Pair */
