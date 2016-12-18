@@ -34,6 +34,8 @@ that enables communication between private subnet instances and the internet.
 * Creates [VPC Route Tables](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Route_Tables.html)
 that enables incoming requests to route through the NAT Gateway to the ECS
 Cluster in the private subnet and other AWS services.
+* Creates a [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host) that
+enables connection to hosts inside the Private Subnet.
 * Creates an [Amazon ECS Cluster](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ECS_clusters.html) in the private subnet of the VPC using an Auto-Scaling group configuration.
 * Creates routing rules to enable access to RDS instances and containers through
 the ALB.
@@ -56,7 +58,7 @@ instance required by a Service.
   * You will need to know some of the details and have administrator rights to
     set up some user privileges
   * A user set up with the permissions outlined [here](#terraform-user-aws-ecs-key-pair)
-  * A generated key-pair with both a public and private key for use EC2 container instance use
+  * A generated key-pair with both a public and private key for use in EC2 container instance use
 * An AWS Registered Domain name in order to [Generate SSL Certificates](Generate SSL Certificates)
 * Terraform installed, recommended (>=0.6.3). Head over to https://www.terraform.io/downloads.html
 to grab the latest version
@@ -71,9 +73,9 @@ tests
 
 1. [Clone the repo](#clone-the-repo)
 2. [Set the Secrets](#set-the-secrets) 
-3. Set the cluster variables
-4. Get the Local Terraform Modules
-5. Check and run the plan
+3. [Set the Cluster Variables](#set-the-cluster-variables)
+4. [Get the Local Terraform Modules](#get-the-local-terraform-modules)
+5. [Check and apply the plan](#check-and-apply-the-plan)
 6. Run the tests
 
 #### Clone the repo
@@ -134,6 +136,8 @@ concepts of environments could be beneficial.
 | ---------------- | ----------- |
 | hosted_zone_id | Route 53 Hosted Zone to associate the ECS Cluster with |
 
+__TODO__: Refactor the Cluster variables out of `main.tf` to make this useful!
+
 If you use an additional variables file be sure to use `-var-file=XXX.tfvars`
 when running Terraform commands.
 
@@ -144,34 +148,139 @@ into the local `.terraform` directory.
 ```
 terraform get
 ```
+This will import the following local modules at this time [alb](./alb), 
+[bastion](./bastion), [ecs_cluster](./ecs_cluster) and [vpc](./vpc). It will
+also import any specific service modules created and present in [main.tf](./main.tf)
 
-#### Check and Run the plan:
-With the default variables in `terraform.tfvars`
+#### Check and Apply the plan
+This section assumes you just want to check and apply the plan. Development and
+changes to the plan require a different workflow. You may want to check and run
+a plan to stand up a new cluster or to deploy a new version of a resource to an
+existing cluster. Checking and running the plan is a two step process. Step one
+validates the plan and step two applies the plan.
+
+###### Checking the Plan
+Checking the plan entails running Terraforms `plan` command that will check the
+known state against the current implementation of the infrastructure. It will
+display additions, updates and removals of resources based on the plan and state.
+Secrets will need to be passed either via environment variables or via a secrets
+file that is not committed to source control.
+
+With the default Cluster variables:
 ```
-terraform plan
-terraform apply 
+terraform plan -var-file=secrets.tfvars
 ```
-With cluster specific variables in `cluster.tfvars`
+With Cluster specific variables in `cluster.tfvars`:
 ```
-terraform plan -var-file=cluster.tfvars
-terraform apply -var-file=cluster.tfvars
+terraform plan -var-file=secrets.tfvars -var-file=cluster.tfvars
 ```
+Example of plan output
+```
+~ module.fp-identity-service.aws_ecs_service.mod
+    task_definition: "arn:aws:ecs:ap-southeast-2:459425154642:task-definition/identity-service:27" => "<computed>"
+
+-/+ module.fp-identity-service.aws_ecs_task_definition.mod
+    arn:                   "arn:aws:ecs:ap-southeast-2:459425154642:task-definition/identity-service:27" => "<computed>"
+    container_definitions: "20a2647aadb14e318329c39945bf00447bc3b376" => "e23d0c5160d733731933b6e7cf75c7b4f19df802" (forces new resource)
+    family:                "identity-service" => "identity-service"
+    network_mode:          "" => "<computed>"
+    revision:              "27" => "<computed>"
+```
+Check that the plan is going to make the changes you expected. Once you are
+happy with the plan you can apply it. You could also check the plan and output
+it to a file and apply against the plan. Any plans saved will apply exactly the
+changes you originally saw but be aware that these plans are likely to contain
+secrets so should be encrypyted if you store them for any length of time.
+
+###### Applying the Plan
+Once you are happy with the plan it is time to apply it. Applying the plan will
+execute the changes into the targeted environment. Once applied the state will
+be updated to reflect the changes made so future plans will only report on the
+changes to be made. Once more secrets will need to be passed either via
+environment variables or via a secrets file that is not committed to source
+control.
+
+With the default Cluster variables:
+```
+terraform apply -var-file=secrets.tfvars
+```
+With Cluster specific variables in `cluster.tfvars`:
+```
+terraform apply -var-file=secrets.tfvars -var-file=cluster.tfvars
+```
+Example of apply output
+```
+Apply complete! Resources 2 added, 1 changed, 0 destroyed.
+
+The state of your infrastructure has been saved to the path
+below. This state is required to modify and destroy your
+infrastructure, so keep it safe. To inspect the complete state
+use the `terraform show` command.
+
+State path: terraform.tfstate
+
+Outputs:
+
+  vpc_id = vpc-ec34d3df
+```
+Once the plan has been applied Terraform will report on the outcome and the
+changes will have been made to both the infrastructure and the state file. You
+can inspect the current state by using the `terraform show` command. The `show`
+command will output secrets too so it is important not to save the output or
+store it for any length of time.
+
 #### Run the tests
 Ensure the `spec/cluster_config.rb` variables are what is expected. These
 should match your `terraform.tfvars`.
 
 ---
 
-## Tear down the resources
-Terraform can remove all the resources added.
+## Bastion Host
+A [Bastion Host](https://en.wikipedia.org/wiki/Bastion_host) with access to the 
+Private Subnet is created by the default Terraform plan. The Bastion has only
+port 22 open for connection. To connect to the Bastion you will need the private
+key associated with your instance during creation or stored in the S3 bucket
+used by the Bastion to establish authorized users. The Bastion host is set up
+to poll for keys in a configuration bucket, so users can be added by placing
+their public keys into this bucket.
 
-With the default variables
+### Connecting to the Bastion Host
+In order to connect to the Bastion you will need a private key associated with
+any of the public keys authorized on the Bastion host and know the Bastion host
+IP address. 
 ```
-terraform destroy
+ssh -i ~/.ssh/XXXX.pem ubuntu@<bastion-host-public-ip>
+```
+
+### Connecting to Container Instances from the Bastion Host 
+Connecting to Container Instances from the Bastion Host is best achieved using
+SSH Agent forwarding from your local instance. To do this you will need to add
+the relevant key/s to your SSH Agent using `ssh-add ~/.ssh/XXXX.pem`. You will
+need the private key for the Container Instances for this process. To use these
+keys to connect to the Container Instances log on to the Bastion host with SSH
+forwarding enabled.
+```
+ssh -A -i ~/.ssh/XXXX.pem ubuntu@<bastion-host-public-ip>
+```
+From the Bastion you should now be able to connect to the Container Instance. You
+will need to know the private IP address of the Container Instance at this point.
+```
+ssh ec2-user@<container-instance-private-ip>
+```
+
+---
+
+## Tear down the resources
+Terraform can remove all the resources added using the `destroy` command based
+on the current state.
+
+With the default Cluster variables
+```
+terraform destroy -var-file=secrets.tfvars
 ```
 With cluster specific variables
 ```
-terraform destroy -var-files=cluster.tfvars
+terraform destroy -var-file=secrets.tfvars -var-files=cluster.tfvars
 ```
 
 ## Linting/Styling
@@ -195,14 +304,28 @@ AWS_PROFILE=terraform_ecs bundle exec rake spec
 
 ---
 
-### Terraform User & AWS ECS Key Pair
-Set up an AWS user called `terraform_ecs` with  AmazonEC2FullAccess, 
-AmazonEC2ContainerServiceFullAccess, AmazonS3FullAccess, CloudWatchFullAccess 
-AWSCertificateManagerReadOnly, AmazonRoute53FullAccess, AmazonRDSFullAccess
-and IAMFullAccess permissions. The user does not need console access.
+### Terraform ECS User 
+Set up an AWS user called `terraform_ecs` with the following permissions
 
-Create a Key Pair for use with the Terraform plan. Name it `devops-ecs` and
-store the .pem file in a secure location.
+| Permission |
+| ---------- |
+| AmazonEC2FullAccess|
+| AmazonEC2ContainerServiceFullAccess |
+| AmazonS3FullAccess |
+| CloudWatchFullAccess |
+| AWSCertificateManagerReadOnly |
+| AmazonRoute53FullAccess |
+| AmazonRDSFullAccess |
+| IAMFullAccess |
+
+The user does not need console access.
+
+### ECS Key Pair
+
+A Key Pair is required for use in the Terraform plan. This Key Pair is installed
+on the Container instances and the Bastion Host by default. By default it should
+be named `devops-ecs`. Store the public and private key files in a secure 
+location.
 
 ---
 
