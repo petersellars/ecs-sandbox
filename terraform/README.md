@@ -76,7 +76,7 @@ tests
 3. [Set the Cluster Variables](#set-the-cluster-variables)
 4. [Get the Local Terraform Modules](#get-the-local-terraform-modules)
 5. [Check and apply the plan](#check-and-apply-the-plan)
-6. Run the tests
+6. [Run the Specifications](#run-the-specifications)
 
 #### Clone the repo
 Clone this repository locally or onto a build server
@@ -229,9 +229,66 @@ can inspect the current state by using the `terraform show` command. The `show`
 command will output secrets too so it is important not to save the output or
 store it for any length of time.
 
-#### Run the tests
-Ensure the `spec/cluster_config.rb` variables are what is expected. These
-should match your `terraform.tfvars`.
+#### Run the Specifications
+In the [./spec](./spec) folder are a number of Specifications that can be run
+to ensure that the infrastrucure has been created that meets the requirements
+for this project. In order to run the tests you will need to use your local AWS
+profile and a cluster specific [spec/cluster_config.rb](./spec/cluster_config.rb).
+
+###### AWS Profile
+It is best to use the same profile you used for creating the infrastructure to
+test the infrastructure. To do this you need to add the `terraform_ecs` user to
+the local `~/.aws/credentials` file
+```
+[terraform_ecs]
+aws_access_key_id = AWS_ACCESS_KEY_ID
+aws_secret_access_key = AWS_SECRET_ACCESS_KEY
+```
+This enables you to specify the `AWS_PROFILE` when running the specifications.
+
+###### Specifications Cluster Configuration
+You now need to ensure the `spec/cluster_config.rb` variables are what is
+expected. At this time the variables needed are listed below:
+
+| Variable | Description |
+| -------- | ----------- |
+| aws_region | The AWS Region to run the specifications in |
+| aws_account | The AWS account to run the specifications in |
+| image_id | The EC2 Container instance expected AMI image |
+| instance_type | The EC2 Container instance expected image type | 
+| key_name | The name of the Key Pair expected in EC2 Container Instances |
+| vpc_name | The expected VPC name |
+| vpc_id   | The expected VPC ID |
+| vpc_igw  | The expected VPC Internet Gateway ID |
+| ecs_security_group | The expected ECS Security group ID |
+| ecs_availability_zones | The expected ECS availability zones |
+| ecs_subnet_ids | The expected ECS subnet IDs |
+| cluster_name | The expected ECS cluster name |
+| launch_configuration | The expected launch configuration ID |
+
+At this time some of these values, which are dependent on generated values
+when applying the Terraform plan are set using [./spec/config.yml](./spec/config.yml).
+The intention is to generate this file from the Terraform plan output thus
+simplifying the sepecifications process. At this time `vpc_name`, `vpc_id` and
+`vpc_igw` are collected from this file. Being able to run against different
+cluster specifications should be implemented moving forward.  
+
+###### Running the Specifications
+Once you have your AWS Profile and Specification Cluster Configuration set up
+you can go ahead and run the specifications
+```
+AWS_PROFILE=terraform_ecs bundle exec rake
+```
+Once the specifications have run you should see output like this:
+```
+/home/psellars/.rbenv/versions/2.3.3/bin/ruby -I/home/psellars/.rbenv/versions/2.3.3/lib/ruby/gems/2.3.0/gems/rspec-core-3.5.4/lib:/home/psellars/.rbenv/versions/2.3.3/lib/ruby/gems/2.3.0/gems/rspec-support-3.5.0/lib /home/psellars/.rbenv/versions/2.3.3/lib/ruby/gems/2.3.0/gems/rspec-core-3.5.4/exe/rspec --pattern spec/\*\*\{,/\*/\*\*\}/\*_spec.rb
+.....................................................................................................
+
+Finished in 41.17 seconds (files took 0.78096 seconds to load)
+101 examples, 0 failures
+```
+Investigate any failures and determine if the expectation has been set correctly
+or the specification is not being met.
 
 ---
 
@@ -272,7 +329,10 @@ ssh ec2-user@<container-instance-private-ip>
 
 ## Tear down the resources
 Terraform can remove all the resources added using the `destroy` command based
-on the current state.
+on the current state. It will backup the state it destroyed into `terraform.tfstate.backup`
+which can be used to restore anything destroyed unintentionally. This file
+contains secrets so should be encrypted if kept for any length of time and not
+be committed to source control.
 
 With the default Cluster variables
 ```
@@ -282,6 +342,10 @@ With cluster specific variables
 ```
 terraform destroy -var-file=secrets.tfvars -var-files=cluster.tfvars
 ```
+
+Once all the infrastructure is destroyed a `terraform.tfstate.backup` file is
+created. Infrastructure will have been destroyed and the current state file
+updated to reflect the new state.
 
 ## Linting/Styling
 This repo uses [Rubocop](http://rubocop.readthedocs.io/en/latest/) for static
@@ -339,3 +403,60 @@ Creation of the Certificate requires an AWS registered Domain. [Requesting a Cer
 is a manual process requiring someone to validate Domain Ownership. Once Domain
 Ownership has been validated the certificate can be used by the Terraform plan
 when creating an SSL ALB.
+
+---
+
+### Development Practices
+
+###### TDD & Rubocop
+When developing you should employ Test Driven Development (TDD) techniques. This
+repository has a [./spec](./spec) folder where specifications should be written
+or updated prior to changing the Terraform plan. These specifications utilise
+both [RSpec](http://rspec.info/) and [awspec](https://github.com/k1LoW/awspec).
+Familiarity with Specification by Example, Ruby and AWS infrastructure is
+beneficial to writing good specifications.
+
+When writing specifications you should always run `bundle exec rubocop` to
+check your syntax and review any issues that are raised. Writing your tests
+before the Terraform plan is possible with `awspec`. `awspec` does not have
+all the required AWS resources at this time but they are added often by the
+community behind the project.
+
+###### Validate Terraform Syntax
+Before running a Terraform plan you should validate the syntax using the
+`validate` command. This will prevent syntax errors during plan validation
+using the `plan` command.
+```
+terraform validate
+```
+
+###### Target Resources with Terraform
+It is possible to target individual resources or groups of resources when using
+Terraform. To do this utilise the `-target` attribute of the `plan` and `apply`
+commands. You can target a number of resources such as a module or an individual
+resource.
+Targeting the `vpc` module
+```
+terraform plan -var-file=secret.tfvars -target=module.vpc
+```
+Targeting the `internet_gateway` in the `vpc` module
+```
+terraform plan -var-file=secret.tfvars -target=module.vpc.aws_internet_gateway.mod
+```
+Targeting both te `internet_gateway` and the `nat_gateway` of the `vpc` module
+```
+terraform plan -var-file=secret.tfvars -target=module.vpc.aws_internet_gateway.mod -target=module.vpc.aws_nat_gateway.natgw
+```
+The `-target` attribute works the same way for `apply` and `destroy` too.
+
+###### Target Specifications with RSpec
+It is possible to target individual specifications or specification file when
+using RSpec.
+Targeting the `vpc` specification
+```
+AWS_PROFILE=terraform_ecs bundle exec rspec .spec/vpc_spec.rb
+```
+Targeting the `public_route_table` scenarios of the `vpc` specification
+```
+AWS_PROFILE=terraform_ecs bundle exec rspec ./spec/vpc_spec.rb -e "public_route_table"
+```
